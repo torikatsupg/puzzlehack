@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzlehack/puzzle_provider.dart';
@@ -25,42 +27,20 @@ class MyApp extends ConsumerWidget {
           child: Consumer(
             builder: (context, ref, _) {
               final state = ref.watch(puzzleProvider);
-              final onTap = ref.read(puzzleProvider.notifier).tryMove;
               return Column(
-                children: [
-                  Row(
-                    children: [
-                      Button(index: 0, cell: state.tiles[0], onTap: onTap),
-                      Button(index: 1, cell: state.tiles[1], onTap: onTap),
-                      Button(index: 2, cell: state.tiles[2], onTap: onTap),
-                      Button(index: 3, cell: state.tiles[3], onTap: onTap),
-                    ],
+                children: List.generate(
+                  4,
+                  (i) => Row(
+                    children: List.generate(
+                      4,
+                      (j) => Button(
+                        index: i * j,
+                        cell: state.tiles[i * j],
+                        onTap: ref.read(puzzleProvider.notifier).tryMove,
+                      ),
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Button(index: 4, cell: state.tiles[4], onTap: onTap),
-                      Button(index: 5, cell: state.tiles[5], onTap: onTap),
-                      Button(index: 6, cell: state.tiles[6], onTap: onTap),
-                      Button(index: 7, cell: state.tiles[7], onTap: onTap),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Button(index: 8, cell: state.tiles[8], onTap: onTap),
-                      Button(index: 9, cell: state.tiles[9], onTap: onTap),
-                      Button(index: 10, cell: state.tiles[10], onTap: onTap),
-                      Button(index: 11, cell: state.tiles[11], onTap: onTap),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Button(index: 12, cell: state.tiles[12], onTap: onTap),
-                      Button(index: 13, cell: state.tiles[13], onTap: onTap),
-                      Button(index: 14, cell: state.tiles[14], onTap: onTap),
-                      Button(index: 15, cell: state.tiles[15], onTap: onTap),
-                    ],
-                  ),
-                ],
+                ),
               );
             },
           ),
