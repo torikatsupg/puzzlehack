@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$PuzzleStateTearOff {
   const _$PuzzleStateTearOff();
 
-  _PuzzleState call({required List<Cell> tiles}) {
+  _PuzzleState call({required List<List<Cell>> tiles}) {
     return _PuzzleState(
       tiles: tiles,
     );
@@ -30,7 +30,7 @@ const $PuzzleState = _$PuzzleStateTearOff();
 
 /// @nodoc
 mixin _$PuzzleState {
-  List<Cell> get tiles => throw _privateConstructorUsedError;
+  List<List<Cell>> get tiles => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PuzzleStateCopyWith<PuzzleState> get copyWith =>
@@ -42,7 +42,7 @@ abstract class $PuzzleStateCopyWith<$Res> {
   factory $PuzzleStateCopyWith(
           PuzzleState value, $Res Function(PuzzleState) then) =
       _$PuzzleStateCopyWithImpl<$Res>;
-  $Res call({List<Cell> tiles});
+  $Res call({List<List<Cell>> tiles});
 }
 
 /// @nodoc
@@ -61,7 +61,7 @@ class _$PuzzleStateCopyWithImpl<$Res> implements $PuzzleStateCopyWith<$Res> {
       tiles: tiles == freezed
           ? _value.tiles
           : tiles // ignore: cast_nullable_to_non_nullable
-              as List<Cell>,
+              as List<List<Cell>>,
     ));
   }
 }
@@ -73,7 +73,7 @@ abstract class _$PuzzleStateCopyWith<$Res>
           _PuzzleState value, $Res Function(_PuzzleState) then) =
       __$PuzzleStateCopyWithImpl<$Res>;
   @override
-  $Res call({List<Cell> tiles});
+  $Res call({List<List<Cell>> tiles});
 }
 
 /// @nodoc
@@ -94,7 +94,7 @@ class __$PuzzleStateCopyWithImpl<$Res> extends _$PuzzleStateCopyWithImpl<$Res>
       tiles: tiles == freezed
           ? _value.tiles
           : tiles // ignore: cast_nullable_to_non_nullable
-              as List<Cell>,
+              as List<List<Cell>>,
     ));
   }
 }
@@ -105,7 +105,7 @@ class _$_PuzzleState extends _PuzzleState {
   _$_PuzzleState({required this.tiles}) : super._();
 
   @override
-  final List<Cell> tiles;
+  final List<List<Cell>> tiles;
 
   @override
   String toString() {
@@ -131,11 +131,11 @@ class _$_PuzzleState extends _PuzzleState {
 }
 
 abstract class _PuzzleState extends PuzzleState {
-  factory _PuzzleState({required List<Cell> tiles}) = _$_PuzzleState;
+  factory _PuzzleState({required List<List<Cell>> tiles}) = _$_PuzzleState;
   _PuzzleState._() : super._();
 
   @override
-  List<Cell> get tiles;
+  List<List<Cell>> get tiles;
   @override
   @JsonKey(ignore: true)
   _$PuzzleStateCopyWith<_PuzzleState> get copyWith =>

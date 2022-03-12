@@ -6,82 +6,94 @@ part 'puzzle_provider.freezed.dart';
 final puzzleProvider = StateNotifierProvider<PuzzleStateNotifier, PuzzleState>(
     (ref) => PuzzleStateNotifier());
 
-final _initTiles = [
-  Cell.tile(number: 1),
-  Cell.tile(number: 2),
-  Cell.tile(number: 3),
-  Cell.tile(number: 4),
-  Cell.tile(number: 5),
-  Cell.tile(number: 6),
-  Cell.tile(number: 7),
-  Cell.tile(number: 8),
-  Cell.tile(number: 9),
-  Cell.tile(number: 10),
-  Cell.tile(number: 11),
-  Cell.tile(number: 12),
-  Cell.tile(number: 13),
-  Cell.tile(number: 14),
-  Cell.tile(number: 15),
-  Cell.space()
-];
-
 /// 00 01 02 03
 /// 04 05 06 07
 /// 08 09 10 11
 /// 12 13 14 15
 class PuzzleStateNotifier extends StateNotifier<PuzzleState> {
-  PuzzleStateNotifier() : super(PuzzleState(tiles: _initTiles));
+  PuzzleStateNotifier() : super(PuzzleState.init());
 
-  void tryMove(int target) => state = state.tryMove(target);
+  void tryMove(int x, int y) => state = state.tryMove(x, y);
 }
 
 @freezed
 class PuzzleState with _$PuzzleState {
-  factory PuzzleState({required List<Cell> tiles}) = _PuzzleState;
-  PuzzleState._();
-
-  PuzzleState tryMove(int target) {
-    final targetTile = tiles[target];
-    final top = _top(target);
-    final bottom = _bottom(target);
-    final left = _left(target);
-    final right = _right(target);
-    print('============');
-    print(target);
-    print(top);
-    print(bottom);
-    print(left);
-    print(right);
-
-    if (_canSwap(targetTile, top)) {
-      return _swap(target, target - 4);
-    } else if (_canSwap(targetTile, bottom)) {
-      return _swap(target, target + 4);
-    } else if (_canSwap(targetTile, left)) {
-      return _swap(target, target - 1);
-    } else if (_canSwap(targetTile, right)) {
-      return _swap(target, target + 1);
-    } else {
-      return this;
-    }
+  factory PuzzleState({required List<List<Cell>> tiles}) = _PuzzleState;
+  factory PuzzleState.init() {
+    final list = List.generate(
+      _width * _height,
+      (index) => index == 15 ? Cell.space() : Cell.tile(number: index + 1),
+    )..shuffle();
+    return PuzzleState(
+      tiles: List.generate(
+        _width,
+        (x) => List.generate(_height, (y) => list.removeAt(0)),
+      ),
+    );
   }
 
-  Cell? _top(target) => _isTopLine(target) ? null : tiles[target - 4];
-  Cell? _bottom(target) => _isBottomLine(target) ? null : tiles[target + 4];
-  Cell? _right(target) => _isRightLine(target) ? null : tiles[target + 1];
-  Cell? _left(target) => _isLeftLine(target) ? null : tiles[target - 1];
+  PuzzleState._();
 
-  bool _isTopLine(int target) => target <= 3;
-  bool _isBottomLine(int target) => target >= 12;
-  bool _isRightLine(int target) => (target + 1) % 4 == 0;
-  bool _isLeftLine(int target) => target % 4 == 0;
+  static const _width = 4;
+  static const _height = 4;
 
-  bool _canSwap(Cell? from, Cell? to) => from is Tile && to is Space;
+  bool _hasTop(y) => y - 1 >= 0;
+  bool _hasBottom(y) => y + 1 <= 3;
+  bool _hasRight(x) => x + 1 <= 3;
+  bool _hasLeft(x) => x - 1 >= 0;
 
-  PuzzleState _swap(int from, int to) {
-    final tmp = [...tiles];
-    tmp.swap(from, to);
-    return copyWith(tiles: tmp);
+  bool get isCompleted => List.generate(
+        _width,
+        (x) => List.generate(
+          _height,
+          (y) {
+            final index = 1 + x + 4 * y;
+            return tiles[y][x].map(
+              tile: (tile) {
+                return tile.number == index;
+              },
+              space: (_) => index == 16,
+            );
+          },
+        ).every((e) => e),
+      ).every((e) => e);
+
+  MoveDirection getMoveDirection(int x, int y) {
+    if (_hasTop(y) && tiles[y - 1][x] is Space) {
+      return MoveDirection.top;
+    } else if (_hasRight(x) && tiles[y][x + 1] is Space) {
+      return MoveDirection.right;
+    } else if (_hasBottom(y) && tiles[y + 1][x] is Space) {
+      return MoveDirection.bottom;
+    } else if (_hasLeft(x) && tiles[y][x - 1] is Space) {
+      return MoveDirection.left;
+    }
+    return MoveDirection.none;
+  }
+
+  PuzzleState tryMove(int x, int y) {
+    final direction = getMoveDirection(x, y);
+    switch (direction) {
+      case MoveDirection.top:
+        tiles[y - 1][x] = tiles[y][x];
+        tiles[y][x] = Space();
+        break;
+      case MoveDirection.right:
+        tiles[y][x + 1] = tiles[y][x];
+        tiles[y][x] = Space();
+        break;
+      case MoveDirection.bottom:
+        tiles[y + 1][x] = tiles[y][x];
+        tiles[y][x] = Space();
+        break;
+      case MoveDirection.left:
+        tiles[y][x - 1] = tiles[y][x];
+        tiles[y][x] = Space();
+        break;
+      case MoveDirection.none:
+        break;
+    }
+    return copyWith(tiles: tiles);
   }
 }
 
@@ -92,3 +104,5 @@ class Cell with _$Cell {
 
   Cell._();
 }
+
+enum MoveDirection { top, right, bottom, left, none }

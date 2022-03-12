@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzlehack/puzzle_provider.dart';
@@ -28,19 +26,28 @@ class MyApp extends ConsumerWidget {
             builder: (context, ref, _) {
               final state = ref.watch(puzzleProvider);
               return Column(
-                children: List.generate(
-                  4,
-                  (i) => Row(
+                children: [
+                  Column(
                     children: List.generate(
                       4,
-                      (j) => Button(
-                        index: i * j,
-                        cell: state.tiles[i * j],
-                        onTap: ref.read(puzzleProvider.notifier).tryMove,
+                      (y) => Row(
+                        children: List.generate(
+                          4,
+                          (x) => Button(
+                            x: x,
+                            y: y,
+                            cell: state.tiles[y][x],
+                            onTap: ref.read(puzzleProvider.notifier).tryMove,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Text(state.isCompleted.toString()),
+                  )
+                ],
               );
             },
           ),
@@ -52,22 +59,24 @@ class MyApp extends ConsumerWidget {
 
 class Button extends StatelessWidget {
   const Button({
-    required this.index,
+    required this.x,
+    required this.y,
     required this.cell,
     required this.onTap,
     Key? key,
   }) : super(key: key);
 
-  final int index;
+  final int x;
+  final int y;
   final Cell cell;
-  final void Function(int) onTap;
+  final void Function(int x, int y) onTap;
 
   @override
   Widget build(BuildContext context) {
     final _cell = cell;
     if (_cell is Tile) {
       return GestureDetector(
-        onTap: () => onTap(index),
+        onTap: () => onTap(x, y),
         child: Container(
           child: Center(
             child: Text(_cell.number.toString()),
